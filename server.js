@@ -293,6 +293,50 @@ app.get("/instance/:id", (req, res) => {
       .result.bad {
         color: #b00020;
       }
+      .terminal {
+        margin-top: 32px;
+        background: #14110f;
+        color: #f6f2e8;
+        border-radius: 12px;
+        padding: 18px;
+        font-family: "Courier New", monospace;
+      }
+      .terminal h2 {
+        margin: 0 0 12px;
+        font-size: 1rem;
+        color: #f0c77a;
+      }
+      .terminal-output {
+        background: #0d0b0a;
+        border-radius: 10px;
+        padding: 12px;
+        min-height: 140px;
+        max-height: 220px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+      .terminal-form {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+      }
+      .terminal-form input {
+        flex: 1 1 auto;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #3d2f22;
+        background: #1e1814;
+        color: #f6f2e8;
+      }
+      .terminal-form button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #f0c77a;
+        color: #1b120d;
+        font-weight: 700;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
@@ -308,6 +352,14 @@ app.get("/instance/:id", (req, res) => {
         </div>
         <p id="flag-result" class="result"></p>
       </form>
+      <div class="terminal">
+        <h2>Restricted Terminal</h2>
+        <div class="terminal-output" id="terminal-output">Allowed: ls, cat, pwd, whoami, date, uname</div>
+        <form class="terminal-form" id="terminal-form">
+          <input id="terminal-input" type="text" autocomplete="off" placeholder="ls -la" />
+          <button type="submit">Run</button>
+        </form>
+      </div>
     </div>
     <!-- ${instance.flag} -->
     <script>
@@ -316,6 +368,9 @@ app.get("/instance/:id", (req, res) => {
       const form = document.getElementById('flag-form');
       const input = document.getElementById('flag-input');
       const result = document.getElementById('flag-result');
+      const terminalForm = document.getElementById('terminal-form');
+      const terminalInput = document.getElementById('terminal-input');
+      const terminalOutput = document.getElementById('terminal-output');
       const tick = () => {
         const remaining = Math.max(0, expiresAt - Date.now());
         const minutes = String(Math.floor(remaining / 60000)).padStart(2, '0');
@@ -353,6 +408,46 @@ app.get("/instance/:id", (req, res) => {
         } catch (err) {
           result.textContent = 'Network error. Try again.';
           result.className = 'result bad';
+        }
+      });
+      const appendTerminal = (text) => {
+        terminalOutput.textContent += text;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+      };
+      terminalForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const command = terminalInput.value.trim();
+        if (!command) {
+          return;
+        }
+        appendTerminal('\\n$ ' + command + '\\n');
+        terminalInput.value = '';
+        terminalInput.disabled = true;
+        try {
+          const response = await fetch('/api/instances/${instance.id}/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ command })
+          });
+          const payload = await response.json();
+          if (!response.ok) {
+            appendTerminal((payload.error || 'Command failed.') + '\\n');
+          } else {
+            if (payload.stdout) {
+              appendTerminal(payload.stdout);
+            }
+            if (payload.stderr) {
+              appendTerminal(payload.stderr + '\\n');
+            }
+            if (!payload.stdout && !payload.stderr) {
+              appendTerminal('(no output)\\n');
+            }
+          }
+        } catch (err) {
+          appendTerminal('Network error.\\n');
+        } finally {
+          terminalInput.disabled = false;
+          terminalInput.focus();
         }
       });
     </script>
