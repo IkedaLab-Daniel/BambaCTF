@@ -314,6 +314,7 @@ app.get("/instance/:id", (req, res) => {
         max-height: 220px;
         overflow-y: auto;
         white-space: pre-wrap;
+        line-height: 1.4;
       }
       .terminal-form {
         margin-top: 12px;
@@ -354,7 +355,7 @@ app.get("/instance/:id", (req, res) => {
       </form>
       <div class="terminal">
         <h2>Restricted Terminal</h2>
-        <div class="terminal-output" id="terminal-output">Allowed: ls, cat, pwd, whoami, date, uname</div>
+        <div class="terminal-output" id="terminal-output"></div>
         <form class="terminal-form" id="terminal-form">
           <input id="terminal-input" type="text" autocomplete="off" placeholder="ls -la" />
           <button type="submit">Run</button>
@@ -371,6 +372,13 @@ app.get("/instance/:id", (req, res) => {
       const terminalForm = document.getElementById('terminal-form');
       const terminalInput = document.getElementById('terminal-input');
       const terminalOutput = document.getElementById('terminal-output');
+      const promptUser = 'eternal_ice-picoctf';
+      const promptHost = 'webshell';
+      const promptPath = '~';
+      const prompt = promptUser + '@' + promptHost + ':' + promptPath + '$ ';
+      let cachedEntries = null;
+      let cachedAt = 0;
+      const cacheTtlMs = 5000;
       const tick = () => {
         const remaining = Math.max(0, expiresAt - Date.now());
         const minutes = String(Math.floor(remaining / 60000)).padStart(2, '0');
@@ -414,13 +422,65 @@ app.get("/instance/:id", (req, res) => {
         terminalOutput.textContent += text;
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
       };
+      const appendPrompt = () => {
+        if (terminalOutput.textContent && !terminalOutput.textContent.endsWith('\\n')) {
+          terminalOutput.textContent += '\\n';
+        }
+        appendTerminal(prompt);
+      };
+      appendTerminal('Allowed: ls, cat, pwd, whoami, date, uname\\n');
+      appendPrompt();
+      const fetchEntries = async () => {
+        const now = Date.now();
+        if (cachedEntries && now - cachedAt < cacheTtlMs) {
+          return cachedEntries;
+        }
+        try {
+          const response = await fetch('/api/instances/${instance.id}/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ command: 'ls' })
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.stdout) {
+            return [];
+          }
+          cachedEntries = payload.stdout
+            .split('\\n')
+            .map((line) => line.trim())
+            .filter(Boolean);
+          cachedAt = now;
+          return cachedEntries;
+        } catch (err) {
+          return [];
+        }
+      };
+      const tryAutocomplete = async () => {
+        const current = terminalInput.value;
+        const match = current.match(/^cat\\s+([a-zA-Z0-9._-]*)$/);
+        if (!match) {
+          return;
+        }
+        const prefix = match[1];
+        const entries = await fetchEntries();
+        const candidates = entries.filter((entry) => entry.startsWith(prefix));
+        if (candidates.length === 1) {
+          terminalInput.value = 'cat ' + candidates[0];
+        }
+      };
+      terminalInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Tab') {
+          event.preventDefault();
+          tryAutocomplete();
+        }
+      });
       terminalForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const command = terminalInput.value.trim();
         if (!command) {
           return;
         }
-        appendTerminal('\\n$ ' + command + '\\n');
+        appendTerminal(command + '\\n');
         terminalInput.value = '';
         terminalInput.disabled = true;
         try {
@@ -446,6 +506,7 @@ app.get("/instance/:id", (req, res) => {
         } catch (err) {
           appendTerminal('Network error.\\n');
         } finally {
+          appendPrompt();
           terminalInput.disabled = false;
           terminalInput.focus();
         }
