@@ -1,18 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
 :root {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Sora', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #121621;
-  background-color: #f6f4f0;
+  color: #e6eef2;
+  background-color: #0b0f12;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --ink: #121621;
-  --muted: #5f6773;
-  --accent: #f08b3e;
+  --text-primary: #e6eef2;
+  --text-muted: #8ea2b2;
 }
 
 * {
@@ -23,7 +22,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #f6f4f0;
+  background: #0b0f12;
 }
 
 a {

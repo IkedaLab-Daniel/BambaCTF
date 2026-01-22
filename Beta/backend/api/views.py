@@ -87,6 +87,11 @@ class ChallengeViewSet(viewsets.ModelViewSet):
                 status=HTTP_400_BAD_REQUEST,
             )
         expires_at = timezone.now() + timedelta(minutes=ttl_minutes)
+        endpoint_url = ""
+        if challenge.slug == "hidden-comment":
+            endpoint_url = request.build_absolute_uri(
+                "/static/api/challenges/hidden-comment/index.html"
+            )
         instance = ChallengeInstance.objects.create(
             challenge=challenge,
             user=request.user,
@@ -95,6 +100,7 @@ class ChallengeViewSet(viewsets.ModelViewSet):
             else None,
             status=ChallengeInstance.Status.PROVISIONING,
             expires_at=expires_at,
+            endpoint_url=endpoint_url,
         )
         serializer = ChallengeInstanceSerializer(instance)
         return Response(serializer.data)
