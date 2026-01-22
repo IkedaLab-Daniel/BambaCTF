@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BambaCTF Prototype</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f1f6ff;
+        --panel: #ffffff;
+        --accent: #ff7a00;
+        --accent-dark: #c35100;
+        --text: #1f2933;
+        --muted: #6b7280;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Futura", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #d9ecff, var(--bg));
+        color: var(--text);
+      }
+
+      header {
+        padding: 48px 24px 16px;
+        text-align: center;
+      }
+
+      header h1 {
+        font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        max-width: 640px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 1.1rem;
+      }
+
+      main {
+        padding: 32px 24px 80px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .panel {
+        width: min(760px, 100%);
+        background: var(--panel);
+        border-radius: 24px;
+        box-shadow: 0 32px 64px rgba(15, 23, 42, 0.15);
+        padding: 32px;
+      }
+
+      .cta {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      button {
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        font-size: 1.1rem;
+        padding: 14px 20px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(255, 122, 0, 0.3);
+      }
+
+      button:disabled {
+        background: #ffd0a3;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .instance {
+        background: #fdf2e9;
+        border-radius: 16px;
+        padding: 16px;
+        color: var(--accent-dark);
+        font-weight: 600;
+        word-break: break-all;
+      }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        color: var(--muted);
+      }
+
+      .pulse {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+        }
+        70% {
+          box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+        }
+      }
+
+      a {
+        color: var(--accent-dark);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 600px) {
+        header {
+          padding-top: 36px;
+        }
+        .panel {
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script>
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [loading, setLoading] = useState(false);
+        const [instance, setInstance] = useState(null);
+        const [remaining, setRemaining] = useState(null);
+
+        useEffect(() => {
+          if (!instance) return;
+          const interval = setInterval(() => {
+            const ms = Math.max(0, instance.expiresAt - Date.now());
+            const minutes = String(Math.floor(ms / 60000)).padStart(2, '0');
+            const seconds = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
+            setRemaining(`${minutes}:${seconds}`);
+            if (ms === 0) {
+              clearInterval(interval);
+            }
+          }, 1000);
+          return () => clearInterval(interval);
+        }, [instance]);
+
+        const createInstance = async () => {
+          setLoading(true);
+          try {
+            const res = await fetch('/api/instances', { method: 'POST' });
+            const data = await res.json();
+            setInstance(data);
+            setRemaining(null);
+          } catch (err) {
+            console.error(err);
+            alert('Failed to create instance.');
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        return React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'header',
+            null,
+            React.createElement('h1', null, 'BambaCTF Instance Lab'),
+            React.createElement(
+              'p',
+              null,
+              'Spin up a 20-minute sandboxed web challenge. The flag is hidden in the HTML comments.'
+            )
+          ),
+          React.createElement(
+            'main',
+            null,
+            React.createElement(
+              'section',
+              { className: 'panel' },
+              React.createElement(
+                'div',
+                { className: 'meta' },
+                React.createElement(
+                  'span',
+                  { className: 'pulse' },
+                  React.createElement('span', { className: 'dot' }),
+                  'Challenge engine online'
+                ),
+                React.createElement('span', null, 'Lifetime: 20 minutes')
+              ),
+              React.createElement(
+                'div',
+                { className: 'cta' },
+                React.createElement(
+                  'button',
+                  { onClick: createInstance, disabled: loading },
+                  loading ? 'Creating...' : 'Create Instance'
+                ),
+                instance &&
+                  React.createElement(
+                    'div',
+                    { className: 'instance' },
+                    React.createElement('div', null, 'Instance link:'),
+                    React.createElement(
+                      'a',
+                      { href: instance.url, target: '_blank', rel: 'noreferrer' },
+                      instance.url
+                    )
+                  ),
+                instance &&
+                  React.createElement(
+                    'div',
+                    { className: 'meta' },
+                    React.createElement(
+                      'span',
+                      null,
+                      remaining ? `Expires in ${remaining}` : 'Counting down...'
+                    ),
+                    React.createElement(
+                      'span',
+                      null,
+                      `Instance ID: ${instance.id}`
+                    )
+                  )
+              )
+            )
+          )
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement(App));
+    </script>
+  </body>
+</html>
