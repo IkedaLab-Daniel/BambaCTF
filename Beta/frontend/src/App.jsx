@@ -1,36 +1,134 @@
+import { useEffect, useMemo, useState } from 'react'
+import { fetchChallenges, loginUser, registerUser, startChallenge, submitFlag } from './api'
 import './App.css'
 
 function App() {
-  const challenges = [
-    {
-      title: 'Vault Echo',
-      category: 'Crypto',
-      difficulty: 'Easy',
-      points: 100,
-      blurb: 'Break a repeating key cipher hidden in audit logs.',
-    },
-    {
-      title: 'Kernel Drift',
-      category: 'Pwn',
-      difficulty: 'Hard',
-      points: 450,
-      blurb: 'Abuse a constrained syscall surface in a micro-sandbox.',
-    },
-    {
-      title: 'Signal Siphon',
-      category: 'Forensics',
-      difficulty: 'Medium',
-      points: 250,
-      blurb: 'Recover a covert channel from a noisy radio capture.',
-    },
-    {
-      title: 'Mirage API',
-      category: 'Web',
-      difficulty: 'Medium',
-      points: 200,
-      blurb: 'Hunt the flag behind layered auth and misdirects.',
-    },
-  ]
+  const [token, setToken] = useState(() => localStorage.getItem('auth_token') || '')
+  const [authError, setAuthError] = useState('')
+  const [authStatus, setAuthStatus] = useState('idle')
+  const [registerForm, setRegisterForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+  })
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: '',
+  })
+  const [spawnStatus, setSpawnStatus] = useState('')
+  const [submitStatus, setSubmitStatus] = useState('')
+  const [submittedFlag, setSubmittedFlag] = useState('')
+  const [selectedChallengeId, setSelectedChallengeId] = useState('')
+  const [challenges, setChallenges] = useState([])
+  const [challengeStatus, setChallengeStatus] = useState('loading')
+  const [challengeError, setChallengeError] = useState('')
+
+  useEffect(() => {
+    let active = true
+
+    async function loadChallenges() {
+      try {
+        const data = await fetchChallenges()
+        if (active) {
+          setChallenges(data)
+          setChallengeStatus('ready')
+        }
+      } catch (error) {
+        if (active) {
+          setChallengeStatus('error')
+          setChallengeError(error.message)
+        }
+      }
+    }
+
+    loadChallenges()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const challengeOptions = useMemo(() => {
+    return challenges.map((challenge) => ({
+      id: challenge.id,
+      title: challenge.title,
+    }))
+  }, [challenges])
+
+  useEffect(() => {
+    if (!selectedChallengeId && challengeOptions.length > 0) {
+      setSelectedChallengeId(String(challengeOptions[0].id))
+    }
+  }, [challengeOptions, selectedChallengeId])
+
+  const handleRegister = async (event) => {
+    event.preventDefault()
+    setAuthStatus('loading')
+    setAuthError('')
+    try {
+      const data = await registerUser(registerForm)
+      localStorage.setItem('auth_token', data.token)
+      setToken(data.token)
+      setAuthStatus('ready')
+    } catch (error) {
+      setAuthStatus('error')
+      setAuthError(error.message)
+    }
+  }
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    setAuthStatus('loading')
+    setAuthError('')
+    try {
+      const data = await loginUser(loginForm)
+      localStorage.setItem('auth_token', data.token)
+      setToken(data.token)
+      setAuthStatus('ready')
+    } catch (error) {
+      setAuthStatus('error')
+      setAuthError(error.message)
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token')
+    setToken('')
+  }
+
+  const handleStartChallenge = async (challengeId) => {
+    if (!token) {
+      setSpawnStatus('Please sign in to start a challenge.')
+      return
+    }
+    setSpawnStatus('Starting instance...')
+    try {
+      await startChallenge(challengeId, token)
+      setSpawnStatus('Instance provisioning started.')
+    } catch (error) {
+      setSpawnStatus(`Failed to start instance. ${error.message}`)
+    }
+  }
+
+  const handleSubmitFlag = async (event) => {
+    event.preventDefault()
+    if (!token) {
+      setSubmitStatus('Please sign in to submit a flag.')
+      return
+    }
+    if (!selectedChallengeId) {
+      setSubmitStatus('Select a challenge first.')
+      return
+    }
+    setSubmitStatus('Submitting...')
+    try {
+      const data = await submitFlag(selectedChallengeId, submittedFlag, token)
+      const result = data.is_correct ? 'Correct! Points awarded.' : 'Incorrect flag.'
+      setSubmitStatus(result)
+    } catch (error) {
+      setSubmitStatus(`Submission failed. ${error.message}`)
+    }
+  }
 
   const scoreboard = [
     { team: 'Shellshockers', points: 4120 },
@@ -56,7 +154,13 @@ function App() {
           <a href="#scoreboard">Scoreboard</a>
         </nav>
         <div className="header-actions">
-          <button className="ghost-button">Sign in</button>
+          {token ? (
+            <button className="ghost-button" onClick={handleLogout}>
+              Sign out
+            </button>
+          ) : (
+            <span className="status-pill">Guest</span>
+          )}
           <button className="primary-button">Launch a Challenge</button>
         </div>
       </header>
@@ -111,6 +215,70 @@ function App() {
           </div>
         </section>
 
+        <section className="section auth-section">
+          <div className="panel">
+            <h2>Register</h2>
+            <p>Create a beta account to launch instances and submit flags.</p>
+            <form className="form-grid" onSubmit={handleRegister}>
+              <input
+                placeholder="Username"
+                value={registerForm.username}
+                onChange={(event) =>
+                  setRegisterForm({ ...registerForm, username: event.target.value })
+                }
+              />
+              <input
+                placeholder="Email (optional)"
+                value={registerForm.email}
+                onChange={(event) =>
+                  setRegisterForm({ ...registerForm, email: event.target.value })
+                }
+              />
+              <input
+                placeholder="Password"
+                type="password"
+                value={registerForm.password}
+                onChange={(event) =>
+                  setRegisterForm({ ...registerForm, password: event.target.value })
+                }
+              />
+              <button className="primary-button" type="submit">
+                Create account
+              </button>
+            </form>
+          </div>
+          <div className="panel highlight">
+            <h2>Login</h2>
+            <p>Use your credentials to access your team space.</p>
+            <form className="form-grid" onSubmit={handleLogin}>
+              <input
+                placeholder="Username"
+                value={loginForm.username}
+                onChange={(event) =>
+                  setLoginForm({ ...loginForm, username: event.target.value })
+                }
+              />
+              <input
+                placeholder="Password"
+                type="password"
+                value={loginForm.password}
+                onChange={(event) =>
+                  setLoginForm({ ...loginForm, password: event.target.value })
+                }
+              />
+              <button className="primary-button" type="submit">
+                Sign in
+              </button>
+            </form>
+            {authStatus === 'error' && (
+              <p className="status-pill status-error">
+                {authError || 'Authentication failed.'}
+              </p>
+            )}
+            {token && <p className="status-pill">Signed in.</p>}
+          </div>
+        </section>
+
         <section id="challenges" className="section">
           <div className="section-header">
             <div>
@@ -119,22 +287,39 @@ function App() {
             </div>
             <button className="ghost-button">Browse Library</button>
           </div>
+          {challengeStatus === 'loading' && (
+            <p className="status-pill">Loading challenges...</p>
+          )}
+          {challengeStatus === 'error' && (
+            <p className="status-pill status-error">
+              Failed to load challenges. {challengeError || 'Try again soon.'}
+            </p>
+          )}
           <div className="challenge-grid">
             {challenges.map((challenge) => (
-              <article key={challenge.title} className="challenge-card">
+              <article key={challenge.id} className="challenge-card">
                 <div className="challenge-meta">
-                  <span>{challenge.category}</span>
+                  <span>{challenge.category?.name || 'Uncategorized'}</span>
                   <span>{challenge.difficulty}</span>
                 </div>
                 <h3>{challenge.title}</h3>
-                <p>{challenge.blurb}</p>
+                <p>{challenge.description}</p>
                 <div className="challenge-footer">
                   <span className="points">{challenge.points} pts</span>
-                  <button className="primary-button small">Spawn</button>
+                  <button
+                    className="primary-button small"
+                    onClick={() => handleStartChallenge(challenge.id)}
+                  >
+                    Spawn
+                  </button>
                 </div>
               </article>
             ))}
+            {challengeStatus === 'ready' && challenges.length === 0 && (
+              <p className="status-pill">No challenges available yet.</p>
+            )}
           </div>
+          {spawnStatus && <p className="status-pill">{spawnStatus}</p>}
         </section>
 
         <section id="instances" className="section split">
@@ -159,6 +344,30 @@ function App() {
             <div className="panel-actions">
               <button className="primary-button">Reconnect</button>
               <button className="ghost-button">Renew TTL</button>
+            </div>
+            <div className="submission-panel">
+              <h3>Submit a Flag</h3>
+              <form className="form-grid" onSubmit={handleSubmitFlag}>
+                <select
+                  value={selectedChallengeId}
+                  onChange={(event) => setSelectedChallengeId(event.target.value)}
+                >
+                  {challengeOptions.map((challenge) => (
+                    <option key={challenge.id} value={challenge.id}>
+                      {challenge.title}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  placeholder="flag{...}"
+                  value={submittedFlag}
+                  onChange={(event) => setSubmittedFlag(event.target.value)}
+                />
+                <button className="primary-button" type="submit">
+                  Submit
+                </button>
+              </form>
+              {submitStatus && <p className="status-pill">{submitStatus}</p>}
             </div>
           </div>
           <div className="panel highlight">

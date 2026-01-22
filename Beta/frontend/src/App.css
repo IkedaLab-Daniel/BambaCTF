@@ -245,6 +245,52 @@ main,
   color: var(--muted);
 }
 
+.status-pill {
+  align-self: flex-start;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.08);
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.status-error {
+  background: rgba(255, 94, 58, 0.18);
+  color: #7c1f16;
+}
+
+.auth-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.form-grid input,
+.form-grid select {
+  border-radius: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  padding: 0.7rem 0.9rem;
+  background: rgba(255, 255, 255, 0.95);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.submission-panel {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(17, 24, 39, 0.2);
+  display: grid;
+  gap: 0.8rem;
+}
+
+.submission-panel h3 {
+  margin: 0;
+}
+
 .challenge-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
