@@ -1,0 +1,28 @@
+* {
+    margin: 0;
+}
+.layout{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+}
+
+.layout .hud{
+    background-color: rgb(108, 0, 0);
+    min-width: 230px;
+}
+
+.layout main{
+    background-color: rgb(0, 0, 88);
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .layout main{
+        height: 100%;
+    }
+}
