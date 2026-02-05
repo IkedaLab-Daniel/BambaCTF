@@ -1,0 +1,33 @@
+.sidebar {
+  width: 320px;
+  min-height: 95vh;
+  border-right: 1.5px solid hsl(200, 18%, 23%);
+  padding: 20px;
+}
+
+.sidebar .logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar .logo img {
+  width: 50px;
+}
+
+.sidebar .logo .title {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .logo .title span {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.sidebar .logo .title .subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #21a4ec;
+}
