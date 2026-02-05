@@ -1,0 +1,6 @@
+header {
+  padding: 15px 20px;
+  border-bottom: 1.5px solid hsl(200, 18%, 23%);
+  display: flex;
+  justify-content: space-between;
+}
