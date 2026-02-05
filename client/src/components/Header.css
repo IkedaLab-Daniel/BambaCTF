@@ -3,4 +3,16 @@ header {
   border-bottom: 1.5px solid hsl(200, 18%, 23%);
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+header .user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+header .user img {
+  width: 2rem;
+  border-radius: 50%;
 }

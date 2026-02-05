@@ -1,3 +1,4 @@
+import avatar from '../assets/avatar.jpeg'
 import './Header.css'
 
 const Header = () => {
@@ -8,7 +9,7 @@ const Header = () => {
         <span className="username">
             @eternal_ice
         </span>
-        <img src="" alt="" />
+        <img src={avatar} alt="" />
       </div>
     </header>
   )
