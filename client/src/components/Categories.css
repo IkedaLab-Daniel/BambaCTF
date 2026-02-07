@@ -27,14 +27,26 @@
   box-shadow: 0 4px 12px rgba(33, 164, 236, 0.2);
 }
 
-.category-card p:first-child {
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.category-header svg {
+  color: #21a4ec;
+  flex-shrink: 0;
+}
+
+.category-header p {
   font-size: 1.25rem;
   font-weight: 600;
   color: #21a4ec;
   margin: 0;
 }
 
-.category-card p:nth-child(2) {
+.category-card > p {
   font-size: 0.9rem;
   color: #888;
   margin: 0;

@@ -1,3 +1,4 @@
+import { Globe, Search, Lock } from 'lucide-react'
 import './Categories.css'
 
 const Categories = () => {
@@ -7,7 +8,10 @@ const Categories = () => {
 
       <div className="category-grid">
         <div className="category-card">
-            <p>Web Exploitation</p>
+            <div className="category-header">
+              <Globe size={32} />
+              <p>Web Exploitation</p>
+            </div>
             <p>Total points: 1000 PTS</p>
             <div className="progress-wrapper">
                 <p className='progress'>Progress</p>
@@ -19,7 +23,10 @@ const Categories = () => {
         </div>
 
         <div className="category-card">
-            <p>Forensics</p>
+            <div className="category-header">
+              <Search size={32} />
+              <p>Forensics</p>
+            </div>
             <p>Total points: 1000 PTS</p>
             <div className="progress-wrapper">
                 <p className='progress'>Progress</p>
@@ -31,7 +38,10 @@ const Categories = () => {
         </div>
         
         <div className="category-card">
-            <p>Cryptography</p>
+            <div className="category-header">
+              <Lock size={32} />
+              <p>Cryptography</p>
+            </div>
             <p>Total points: 1000 PTS</p>
             <div className="progress-wrapper">
                 <p className='progress'>Progress</p>
