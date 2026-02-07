@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom'
 import { PanelsTopLeft, User, Trophy, Wrench } from 'lucide-react'
 import './Sidebar.css'
 import icon from '../assets/icon.png'
@@ -14,25 +15,25 @@ const Sidebar = () => {
       </div>
 
       <div className="buttons">
-        <div className="btn-link">
+        <NavLink to="/" end className={({ isActive }) => isActive ? "btn-link active" : "btn-link"}>
             <PanelsTopLeft />
             <span>Dashboard</span>
-        </div>
+        </NavLink>
 
-        <div className="btn-link">
+        <NavLink to="/profile" className={({ isActive }) => isActive ? "btn-link active" : "btn-link"}>
             <User />
             <span>Profile</span>
-        </div>
+        </NavLink>
 
-        <div className="btn-link">
+        <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "btn-link active" : "btn-link"}>
             <Trophy />
             <span>Leaderboard</span>
-        </div>
+        </NavLink>
 
-        <div className="btn-link">
+        <NavLink to="/tools" className={({ isActive }) => isActive ? "btn-link active" : "btn-link"}>
             <Wrench />
             <span>Tools</span>
-        </div>
+        </NavLink>
       </div>
     </div>
   )

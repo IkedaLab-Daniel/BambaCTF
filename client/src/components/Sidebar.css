@@ -1,5 +1,5 @@
 .sidebar {
-  width: 320px;
+  width: 250px;
   min-height: 100%;
   border-right: 1.5px solid hsl(200, 18%, 23%);
   padding: 20px;
@@ -41,8 +41,21 @@
 }
 
 .sidebar .buttons .btn-link {
-  padding: 8px;
+  padding: 12px;
   display: flex;
   align-items: center;
   gap: 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+
+.sidebar .buttons .btn-link:hover {
+  background-color: #323e45;
+}
+
+.sidebar .buttons .btn-link.active {
+  background-color: #21a4ec;
+  color: white;
 }
