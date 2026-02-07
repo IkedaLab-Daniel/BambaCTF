@@ -1,5 +1,6 @@
 import { Globe, Search, Lock } from 'lucide-react'
 import './Categories.css'
+import { NavLink } from 'react-router-dom'
 
 const Categories = () => {
   return (
@@ -19,7 +20,9 @@ const Categories = () => {
             </div>
             
             {/* progress bar */}
-            <button>View Challenges</button>
+            <NavLink to="/categories/webexploitation">
+                <button>View Challenges</button>
+            </NavLink>
         </div>
 
         <div className="category-card">
@@ -34,7 +37,9 @@ const Categories = () => {
             </div>
             
             {/* progress bar */}
-            <button>View Challenges</button>
+            <NavLink to="/categories/forensics">
+                <button>View Challenges</button>
+            </NavLink>
         </div>
         
         <div className="category-card">
@@ -49,7 +54,9 @@ const Categories = () => {
             </div>
             
             {/* progress bar */}
-            <button>View Challenges</button>
+            <NavLink to="/categories/crpytography">
+                <button>View Challenges</button>
+            </NavLink>
         </div>
 
       </div>
