@@ -1,3 +1,9 @@
+.problems h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
 .problem-set {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -5,13 +11,14 @@
 }
 
 .problem-card {
-  background-color: #333;
-  border-radius: 8px;
+background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
 }
 
 .problem-card:hover {

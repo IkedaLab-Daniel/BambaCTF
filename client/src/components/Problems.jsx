@@ -2,29 +2,32 @@ import "./Problems.css";
 
 const Problems = () => {
   return (
-    <div className="problem-set">
-        <div className="problem-card">
-            <span className="label">Level 1</span>
-            <span className="title">HTML Inspector</span>
-            <button>Start</button>
-        </div>
+    <div className="problems">
+        <h2>Problems</h2>
+        <div className="problem-set">
+            <div className="problem-card">
+                <span className="label">Level 1</span>
+                <span className="title">HTML Inspector</span>
+                <button>Start</button>
+            </div>
 
-        <div className="problem-card">
-            <span className="label">Level 2</span>
-            <span className="title">HTML Inspector</span>
-            <button>Start</button>
-        </div>
+            <div className="problem-card">
+                <span className="label">Level 2</span>
+                <span className="title">HTML Inspector</span>
+                <button>Start</button>
+            </div>
 
-        <div className="problem-card">
-            <span className="label">Level 3</span>
-            <span className="title">HTML Inspector</span>
-            <button>Start</button>
-        </div>
+            <div className="problem-card">
+                <span className="label">Level 3</span>
+                <span className="title">HTML Inspector</span>
+                <button>Start</button>
+            </div>
 
-        <div className="problem-card">
-            <span className="label">Level 4</span>
-            <span className="title">HTML Inspector</span>
-            <button>Start</button>
+            <div className="problem-card">
+                <span className="label">Level 4</span>
+                <span className="title">HTML Inspector</span>
+                <button>Start</button>
+            </div>
         </div>
     </div>
   )
