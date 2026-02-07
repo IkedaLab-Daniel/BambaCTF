@@ -1,0 +1,75 @@
+.categories h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.category-card {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  border-color: #21a4ec;
+  box-shadow: 0 4px 12px rgba(33, 164, 236, 0.2);
+}
+
+.category-card p:first-child {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #21a4ec;
+  margin: 0;
+}
+
+.category-card p:nth-child(2) {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0;
+}
+.category-card .progress-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.category-card .progress-wrapper .progress {
+  font-size: 0.875rem;
+  color: #aaa;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.category-card .progress-wrapper .flag-count {
+  font-size: 0.875rem;
+  color: #aaa;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.category-card button {
+  margin-top: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: #21a4ec;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.category-card button:hover {
+  background-color: #1a8ad1;
+}
