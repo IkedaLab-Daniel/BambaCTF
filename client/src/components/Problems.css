@@ -15,7 +15,7 @@ background-color: #1e1e1e;
   border: 1px solid #333;
   border-radius: 12px;
   padding: 1.5rem;
-  display: flex;
+  display: flex; 
   flex-direction: column;
   gap: 0.75rem;
   transition: all 0.3s ease;
