@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { authAPI } from '../services/api'
 import './Auth.css'
+import icon from '../assets/icon.png'
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true)
@@ -63,7 +64,12 @@ const Auth = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>BambaCTF</h1>
+          <img src={icon} alt='icon'/>
+          <div className='icon-text'>
+            <h1>BambaCTF</h1>
+            <p>A Prototype</p>
+          </div>
+          
         </div>
 
         <div className="auth-tabs">
