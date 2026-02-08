@@ -5,8 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Leaderboard from './pages/Leaderboard'
 import Tools from './pages/Tools'
-import Login from './pages/Login'
-import Register from './pages/Register'
+import Auth from './pages/Auth'
 import Home from './components/Home'
 
 const App = () => {
@@ -14,8 +13,7 @@ const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Auth />} />
           <Route
             path="/"
             element={
